@@ -9,7 +9,7 @@ if (process.argv.length != 5) {
     process.exit();
 }
 
-var localport = 443;
+var localport = 80;
 var remotehost = "24.84.245.211";
 var remoteport = 8080;
 
