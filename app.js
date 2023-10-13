@@ -9,9 +9,9 @@ if (process.argv.length != 5) {
     process.exit();
 }
 
-var localport = process.argv[2];
-var remotehost = process.argv[3];
-var remoteport = process.argv[4];
+var localport = 443;
+var remotehost = "24.84.245.211";
+var remoteport = 8080;
 
 var server = net.createServer(function (localsocket) {
     var remotesocket = new net.Socket();
