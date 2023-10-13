@@ -4,10 +4,6 @@ process.on("uncaughtException", function (error) {
     console.error(error);
 });
 
-if (process.argv.length != 5) {
-    console.log("usage: %s <localport> <remotehost> <remoteport>", process.argv[1]);
-    process.exit();
-}
 
 var localport = process.env.PORT;
 var remotehost = "24.84.245.211";
