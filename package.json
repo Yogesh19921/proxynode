@@ -2,9 +2,6 @@
   "name": "proxy-node",
   "version": "0.0.0",
   "description": "ProxyNode",
-  "scripts": {
-    "start": "node app.js"
-  },
   "main": "app.js",
   "author": {
     "name": ""
