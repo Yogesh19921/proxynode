@@ -1,85 +1,26 @@
-var net = require("net");
+const express = require('express');
+const httpProxy = require('http-proxy');
 
-process.on("uncaughtException", function (error) {
-    console.error(error);
+const app = express();
+const proxy = httpProxy.createProxyServer();
+
+// Replace with your target host and port
+const targetHost = '24.84.245.211';
+const targetPort = 8080;
+
+app.use((req, res) => {
+    proxy.web(req, res, {
+        target: `${targetHost}:${targetPort}`
+    });
 });
 
-
-var localport = process.env.PORT;
-var remotehost = "24.84.245.211";
-var remoteport = 8080;
-
-var server = net.createServer(function (localsocket) {
-    var remotesocket = new net.Socket();
-
-    remotesocket.connect(remoteport, remotehost);
-
-    localsocket.on('connect', function (data) {
-        console.log(">>> connection #%d from %s:%d",
-            server.connections,
-            localsocket.remoteAddress,
-            localsocket.remotePort
-        );
+proxy.on('error', (err, req, res) => {
+    res.writeHead(500, {
+        'Content-Type': 'text/plain'
     });
-
-    localsocket.on('data', function (data) {
-        console.log("%s:%d - writing data to remote",
-            localsocket.remoteAddress,
-            localsocket.remotePort
-        );
-        var flushed = remotesocket.write(data);
-        if (!flushed) {
-            console.log("  remote not flushed; pausing local");
-            localsocket.pause();
-        }
-    });
-
-    remotesocket.on('data', function (data) {
-        console.log("%s:%d - writing data to local",
-            localsocket.remoteAddress,
-            localsocket.remotePort
-        );
-        var flushed = localsocket.write(data);
-        if (!flushed) {
-            console.log("  local not flushed; pausing remote");
-            remotesocket.pause();
-        }
-    });
-
-    localsocket.on('drain', function () {
-        console.log("%s:%d - resuming remote",
-            localsocket.remoteAddress,
-            localsocket.remotePort
-        );
-        remotesocket.resume();
-    });
-
-    remotesocket.on('drain', function () {
-        console.log("%s:%d - resuming local",
-            localsocket.remoteAddress,
-            localsocket.remotePort
-        );
-        localsocket.resume();
-    });
-
-    localsocket.on('close', function (had_error) {
-        console.log("%s:%d - closing remote",
-            localsocket.remoteAddress,
-            localsocket.remotePort
-        );
-        remotesocket.end();
-    });
-
-    remotesocket.on('close', function (had_error) {
-        console.log("%s:%d - closing local",
-            localsocket.remoteAddress,
-            localsocket.remotePort
-        );
-        localsocket.end();
-    });
-
+    res.end('Something went wrong. And we are reporting a custom error message.');
 });
 
-server.listen(localport);
-
-console.log("redirecting connections from 127.0.0.1:%d to %s:%d", localport, remotehost, remoteport);
+app.listen(localport, () => {
+    console.log(`Server running on port 8000, proxying requests to ${targetHost}:${targetPort}`);
+});
